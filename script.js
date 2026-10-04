@@ -8,3 +8,16 @@ const reveal=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isInters
 const sections=[...document.querySelectorAll("main section[id]")],links=[...document.querySelectorAll("[data-nav]")];const active=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)links.forEach(l=>l.classList.toggle("active",l.dataset.nav===e.target.id))}),{rootMargin:"-35% 0px -55% 0px"});sections.forEach(s=>active.observe(s));
 const cursor=document.querySelector(".cursor"),dot=document.querySelector(".cursor-dot");window.addEventListener("pointermove",e=>{if(!cursor)return;cursor.classList.add("is-visible");cursor.style.left=e.clientX+"px";cursor.style.top=e.clientY+"px";dot.style.left=e.clientX+"px";dot.style.top=e.clientY+"px"});document.querySelectorAll("a,button").forEach(el=>{el.addEventListener("mouseenter",()=>cursor?.classList.add("is-hover"));el.addEventListener("mouseleave",()=>cursor?.classList.remove("is-hover"))});
 document.querySelectorAll(".magnetic").forEach(el=>{el.addEventListener("pointermove",e=>{const r=el.getBoundingClientRect();el.style.transform="translate("+((e.clientX-r.left-r.width/2)*.08)+"px,"+((e.clientY-r.top-r.height/2)*.08)+"px)"});el.addEventListener("pointerleave",()=>el.style.transform="")});
+
+const reservationForm=document.getElementById("reservation-form");
+const reservationDate=document.getElementById("reservation-date");
+const localDate=new Intl.DateTimeFormat("en-CA",{timeZone:"Africa/Kampala",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
+const datePart=type=>localDate.find(part=>part.type===type).value;
+if(reservationDate)reservationDate.min=datePart("year")+"-"+datePart("month")+"-"+datePart("day");
+reservationForm?.addEventListener("submit",event=>{
+  event.preventDefault();
+  if(!reservationForm.reportValidity())return;
+  const details=new FormData(reservationForm);
+  const message="Hi Street Club Entebbe! I'd like to request a reservation.\nSpace: "+details.get("space")+"\nDate: "+details.get("date")+"\nGuests: "+details.get("guests")+(String(details.get("note")||"").trim()?"\nNotes: "+String(details.get("note")).trim():"")+"\nPlease confirm availability.";
+  window.location.assign("https://wa.me/256705447013?text="+encodeURIComponent(message));
+});
